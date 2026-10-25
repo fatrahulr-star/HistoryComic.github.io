@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fr.asw Style - Comic History</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NAVBAR ATAS -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo-icon">⚡</span>
+            <h1>Comic<span>History</span></h1>
+        </div>
+        <div class="nav-actions">
+            <button id="btn-buka-tambah" class="btn-tambah-nav" style="display: none;">+ Tambah Komik</button>
+            <div id="info-akun-nav" class="info-akun-nav" style="display: none;">
+                <span id="teks-user"></span>
+                <button id="btn-keluar" class="btn-logout">Keluar</button>
+            </div>
+            <button id="btn-buka-login" class="btn-login-nav">Masuk</button>
+        </div>
+    </nav>
+
+    <!-- KONTEN UTAMA (GRID ALA SHINIGAMI SEARCH) -->
+    <main class="container">
+        
+        <!-- Bar Pencarian & Filter Status -->
+        <section class="search-section">
+            <div class="search-box">
+                <input type="text" id="input-cari" placeholder="Cari judul komik di koleksimu...">
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-btn active" data-filter="Semua">Semua</button>
+                <button class="filter-btn" data-filter="Sedang Dibaca">Reading</button>
+                <button class="filter-btn" data-filter="Tamat">Completed</button>
+                <button class="filter-btn" data-filter="Rencana Baca">Plan to Read</button>
+            </div>
+        </section>
+
+        <!-- Form Tambah Komik (Bisa Dibuka/Tutup) -->
+        <section id="panel-tambah" class="panel-tambah" style="display: none;">
+            <div class="panel-header">
+                <h2>Tambah Komik Baru</h2>
+                <button type="button" id="btn-tutup-tambah" class="btn-close-kecil">✕</button>
+            </div>
+            <form id="form-komik" class="form-grid">
+                <div>
+                    <label>Judul Komik</label>
+                    <input type="text" id="judul" placeholder="Contoh: Solo Leveling" required>
+                </div>
+                <div>
+                    <label>Chapter Terakhir</label>
+                    <input type="number" id="chapter" placeholder="Contoh: 110" min="0" required>
+                </div>
+                <div>
+                    <label>Status Baca</label>
+                    <select id="status">
+                        <option value="Sedang Dibaca">Sedang Dibaca (Reading)</option>
+                        <option value="Tamat">Sudah Tamat (Completed)</option>
+                        <option value="Rencana Baca">Rencana Baca (Plan)</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Poster / Sampul Komik</label>
+                    <input type="file" id="sampul" accept="image/*">
+                </div>
+                <div class="form-full">
+                    <button type="submit" class="btn-simpan-komik">Simpan ke Koleksi</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Judul Daftar & Jumlah Komik -->
+        <div class="section-title">
+            <h2>Daftar Koleksi Komik</h2>
+            <span id="total-komik" class="badge-total">0 Komik</span>
+        </div>
+
+        <!-- WADAH GRID KOMIK ALA SHINIGAMI -->
+        <div id="daftar-komik" class="shinigami-grid">
+            <!-- Kartu komik akan muncul di sini -->
+        </div>
+
+    </main>
+
+    <!-- MODAL LOGIN PERSIS SEPERTI CONTOH GAMBAR -->
+    <div id="modal-auth" class="modal-overlay">
+        <div class="auth-card">
+            <!-- Tombol Silang (X) di Pojok Kanan Atas -->
+            <button type="button" id="btn-tutup-modal" class="auth-close" title="Tutup">✕</button>
+
+            <!-- Tab Social & Password -->
+            <div class="auth-tabs">
+                <button type="button" class="auth-tab" id="tab-social">Social</button>
+                <button type="button" class="auth-tab active" id="tab-password">Password</button>
+            </div>
+
+            <!-- Konten Tab Password -->
+            <div id="konten-password">
+                <h2 id="judul-modal-auth" class="auth-title">Login with Password</h2>
+
+                <form id="form-auth" autocomplete="off">
+                    <div class="auth-input-group">
+                        <input type="email" id="email-user" placeholder="Email" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <input type="password" id="password-user" placeholder="Password (min. 8 karakter)" required>
+                    </div>
+
+                    <p id="pesan-auth" class="pesan-auth"></p>
+
+                    <button type="submit" id="btn-submit-auth" class="auth-submit-btn">Login</button>
+                </form>
+
+                <div class="auth-footer">
+                    <p id="teks-bantuan-auth">Untuk mendapatkan password lihat tutorial ini:</p>
+                    <a href="#" id="link-ganti-mode">Mengatur Password</a>
+                </div>
+            </div>
+
+            <!-- Konten Tab Social (Info) -->
+            <div id="konten-social" style="display: none; text-align: center; padding: 20px 0;">
+                <h2 class="auth-title">Social Login</h2>
+                <p style="color: #a1a1aa; font-size: 14px; margin-bottom: 20px;">
+                    Gunakan tab <strong>Password</strong> di sebelah kanan untuk masuk atau mengatur password akunmu.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
