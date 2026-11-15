@@ -105,11 +105,11 @@ body {
     padding: 0 20px;
 }
 
-/* 2 Tab Utama: Komik & Novel (Bercabang) */
+/* 3 Tab Utama: Komik, Novel (Bercabang), dan Buku Bacaan Biasa */
 .category-tabs {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     margin-bottom: 12px;
     background-color: #141419;
     border: 1px solid #23232c;
@@ -480,6 +480,11 @@ body {
 }
 
 .type-novel-biasa {
+    background: rgba(168, 85, 247, 0.92);
+    color: #fff;
+}
+
+.type-buku {
     background: rgba(245, 158, 11, 0.92);
     color: #fff;
 }

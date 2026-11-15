@@ -94,6 +94,7 @@ const inputCari = document.getElementById('input-cari');
 const filterBtns = document.querySelectorAll('.filter-btn');
 const tabKomik = document.getElementById('tab-komik');
 const tabNovel = document.getElementById('tab-novel');
+const tabBuku = document.getElementById('tab-buku');
 const cabangNovelBar = document.getElementById('cabang-novel-bar');
 const subNovelBtns = document.querySelectorAll('.sub-novel-btn');
 
@@ -113,7 +114,7 @@ function normalisasiKategori(kategoriData) {
     return kategoriData;
 }
 
-// Sesuaikan tampilan form berdasarkan pilihan Komik, Light Novel, atau Novel Biasa
+// Sesuaikan tampilan form berdasarkan pilihan Komik, Light Novel, Novel Biasa, atau Buku Bacaan Biasa
 function sesuaikanFormKategori(tipe) {
     inputKategori.value = tipe;
     if (tipe === 'Light Novel') {
@@ -128,9 +129,21 @@ function sesuaikanFormKategori(tipe) {
         inputHalamanAkhir.required = false;
         labelSampul.textContent = 'Poster / Sampul Light Novel';
     } else if (tipe === 'Novel Biasa') {
-        judulFormTambah.textContent = 'Tambah Novel Biasa (Buku Bacaan)';
-        labelJudul.textContent = 'Judul Novel / Buku Bacaan';
-        inputJudul.placeholder = 'Contoh: Laskar Pelangi / Bumi';
+        judulFormTambah.textContent = 'Tambah Novel Biasa Baru';
+        labelJudul.textContent = 'Judul Novel Biasa';
+        inputJudul.placeholder = 'Contoh: Bumi / Laut Bercerita';
+        wadahVolume.style.display = 'none';
+        inputVolume.value = '';
+        wadahChapter.style.display = 'block';
+        inputChapter.required = true;
+        wadahHalamanBuku.style.display = 'none';
+        inputHalamanAwal.required = false;
+        inputHalamanAkhir.required = false;
+        labelSampul.textContent = 'Poster / Sampul Novel Biasa';
+    } else if (tipe === 'Buku Bacaan Biasa') {
+        judulFormTambah.textContent = 'Tambah Buku Bacaan Biasa';
+        labelJudul.textContent = 'Judul Buku Bacaan';
+        inputJudul.placeholder = 'Contoh: Atomic Habits / Filosofi Teras';
         wadahVolume.style.display = 'none';
         inputVolume.value = '';
         wadahChapter.style.display = 'none';
@@ -294,6 +307,7 @@ function tampilkanKomik() {
         const tipeBacaan = normalisasiKategori(komik.kategori);
         const isLightNovel = tipeBacaan === 'Light Novel';
         const isNovelBiasa = tipeBacaan === 'Novel Biasa';
+        const isBukuBiasa = tipeBacaan === 'Buku Bacaan Biasa';
 
         let kelasTipe = 'type-komik';
         let ikonTipe = '📘';
@@ -302,6 +316,9 @@ function tampilkanKomik() {
             ikonTipe = '✨';
         } else if (isNovelBiasa) {
             kelasTipe = 'type-novel-biasa';
+            ikonTipe = '📖';
+        } else if (isBukuBiasa) {
+            kelasTipe = 'type-buku';
             ikonTipe = '📕';
         }
 
@@ -324,7 +341,7 @@ function tampilkanKomik() {
         let aksiTambahHTML = '';
         let labelEditCabang = '📝 Edit Nama & Chapter';
 
-        if (isNovelBiasa) {
+        if (isBukuBiasa) {
             const halAwal = komik.halamanAwal || 1;
             const halAkhir = komik.halamanAkhir || komik.chapter || 1;
             teksChapter = `Hal. ${halAwal} - ${halAkhir}`;
@@ -428,11 +445,18 @@ function sinkronkanTabDenganKategori(tipe) {
     if (tipe === 'Komik') {
         tabKomik.classList.add('active');
         tabNovel.classList.remove('active');
+        tabBuku.classList.remove('active');
+        cabangNovelBar.style.display = 'none';
+    } else if (tipe === 'Buku Bacaan Biasa') {
+        tabKomik.classList.remove('active');
+        tabNovel.classList.remove('active');
+        tabBuku.classList.add('active');
         cabangNovelBar.style.display = 'none';
     } else {
         subNovelAktif = tipe;
         tabKomik.classList.remove('active');
         tabNovel.classList.add('active');
+        tabBuku.classList.remove('active');
         cabangNovelBar.style.display = 'grid';
         subNovelBtns.forEach((b) => {
             b.classList.toggle('active', b.getAttribute('data-subnovel') === subNovelAktif);
@@ -451,10 +475,10 @@ formKomik.addEventListener('submit', async (e) => {
         ? Number(inputVolume.value)
         : null;
 
-    const isNovelBiasa = tipeDipilih === 'Novel Biasa';
-    const halAwal = isNovelBiasa ? (Number(inputHalamanAwal.value) || 1) : null;
-    const halAkhir = isNovelBiasa ? (Number(inputHalamanAkhir.value) || 1) : null;
-    const nilaiChapter = isNovelBiasa ? halAkhir : (Number(inputChapter.value) || 0);
+    const isBukuBiasa = tipeDipilih === 'Buku Bacaan Biasa';
+    const halAwal = isBukuBiasa ? (Number(inputHalamanAwal.value) || 1) : null;
+    const halAkhir = isBukuBiasa ? (Number(inputHalamanAkhir.value) || 1) : null;
+    const nilaiChapter = isBukuBiasa ? halAkhir : (Number(inputChapter.value) || 0);
 
     let dataFoto = null;
     if (inputSampul.files && inputSampul.files[0]) {
@@ -567,7 +591,7 @@ window.bukaModalEdit = (idDokumen) => {
     labelEditJudul.textContent = `Nama / Judul ${tipe}`;
     inputEditJudul.value = data.judul;
 
-    if (tipe === 'Novel Biasa') {
+    if (tipe === 'Buku Bacaan Biasa') {
         grupEditChapter.style.display = 'none';
         grupEditHalaman.style.display = 'block';
         editHalamanAwal.value = data.halamanAwal || 1;
@@ -619,14 +643,14 @@ formEditInfo.addEventListener('submit', async (e) => {
     const tipe = normalisasiKategori(komikSedangDiedit.kategori);
 
     try {
-        if (tipe === 'Novel Biasa') {
+        if (tipe === 'Buku Bacaan Biasa') {
             const awalBaru = Math.max(1, Number(editHalamanAwal.value) || 1);
             const akhirDasar = Math.max(1, Number(editHalamanAkhir.value) || 1);
             const tambahanHal = Math.max(0, Number(inputTambahHalaman.value) || 0);
             const akhirBaru = akhirDasar + tambahanHal;
 
             await updateDoc(doc(db, "koleksi_komik", komikSedangDiedit.id), {
-                kategori: 'Novel Biasa',
+                kategori: 'Buku Bacaan Biasa',
                 judul: judulBaru,
                 halamanAwal: awalBaru,
                 halamanAkhir: akhirBaru,
@@ -682,7 +706,7 @@ filterBtns.forEach((btn) => {
     });
 });
 
-// Navigasi Tab Komik vs Novel (Bercabang ke Light Novel & Novel Biasa)
+// Navigasi 3 Tab Utama: Komik, Novel (Bercabang: Light Novel & Novel Biasa), dan Buku Bacaan Biasa
 tabKomik.addEventListener('click', () => {
     sinkronkanTabDenganKategori('Komik');
     tampilkanKomik();
@@ -690,6 +714,11 @@ tabKomik.addEventListener('click', () => {
 
 tabNovel.addEventListener('click', () => {
     sinkronkanTabDenganKategori(subNovelAktif);
+    tampilkanKomik();
+});
+
+tabBuku.addEventListener('click', () => {
+    sinkronkanTabDenganKategori('Buku Bacaan Biasa');
     tampilkanKomik();
 });
 

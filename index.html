@@ -26,16 +26,17 @@
 
     <!-- KONTEN UTAMA -->
     <main class="container">
-        <!-- 2 Tab Utama: Komik & Novel (Bercabang menjadi Light Novel & Novel Biasa) -->
+        <!-- 3 Tab Utama: Komik, Novel (Bercabang: Light Novel & Novel Biasa), dan Buku Bacaan Biasa -->
         <div class="category-tabs">
             <button type="button" class="cat-btn active" id="tab-komik" data-kategori="Komik">📘 Komik</button>
             <button type="button" class="cat-btn" id="tab-novel" data-kategori="Novel">📖 Novel ▾</button>
+            <button type="button" class="cat-btn" id="tab-buku" data-kategori="Buku Bacaan Biasa">📕 Buku Bacaan Biasa</button>
         </div>
 
         <!-- Cabang Pilihan Novel: Light Novel & Novel Biasa -->
         <div id="cabang-novel-bar" class="cabang-novel-bar" style="display: none;">
             <button type="button" class="sub-novel-btn active" data-subnovel="Light Novel">✨ Light Novel</button>
-            <button type="button" class="sub-novel-btn" data-subnovel="Novel Biasa">📕 Novel Biasa (Buku Bacaan)</button>
+            <button type="button" class="sub-novel-btn" data-subnovel="Novel Biasa">📖 Novel Biasa</button>
         </div>
 
         <section class="search-section">
@@ -50,7 +51,7 @@
             </div>
         </section>
 
-        <!-- Form Tambah Komik / Light Novel / Novel Biasa -->
+        <!-- Form Tambah Komik / Light Novel / Novel Biasa / Buku Bacaan Biasa -->
         <section id="panel-tambah" class="panel-tambah" style="display: none;">
             <div class="panel-header">
                 <h2 id="judul-form-tambah">Tambah Komik Baru</h2>
@@ -62,7 +63,8 @@
                     <select id="kategori">
                         <option value="Komik">📘 Komik (Manga / Manhwa / Manhua)</option>
                         <option value="Light Novel">✨ Light Novel (Web Novel / LN)</option>
-                        <option value="Novel Biasa">📕 Novel Biasa (Buku Bacaan Biasa)</option>
+                        <option value="Novel Biasa">📖 Novel Biasa</option>
+                        <option value="Buku Bacaan Biasa">📕 Buku Bacaan Biasa</option>
                     </select>
                 </div>
                 <div>
