@@ -105,6 +105,37 @@ body {
     padding: 0 20px;
 }
 
+/* 2 Tab Halaman Utama: Halaman Komik & Halaman Novel */
+.category-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+    background-color: #141419;
+    border: 1px solid #23232c;
+    padding: 8px;
+    border-radius: 14px;
+}
+
+.cat-btn {
+    background-color: transparent;
+    color: #a1a1aa;
+    border: 1px solid transparent;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+}
+
+.cat-btn.active, .cat-btn:hover {
+    background-color: #6c47ff;
+    color: #ffffff;
+    border-color: #6c47ff;
+}
+
 .search-section {
     background-color: #141419;
     border: 1px solid #23232c;
@@ -215,6 +246,65 @@ body {
     grid-column: 1 / -1;
 }
 
+.preview-sampul-wadah {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background-color: #1e1e26;
+    border: 1px solid #2e2e3a;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.preview-sampul-wadah img {
+    width: 65px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #383846;
+}
+
+.preview-sampul-aksi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.btn-ubah-sampul-form {
+    background-color: #2c2c3a;
+    color: #ffffff;
+    border: 1px solid #3f3f52;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-ubah-sampul-form:hover {
+    background-color: #6c47ff;
+    border-color: #6c47ff;
+}
+
+.btn-hapus-sampul-form {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-hapus-sampul-form:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
 .btn-simpan-komik {
     width: 100%;
     background-color: #6c47ff;
@@ -316,6 +406,28 @@ body {
 .status-tamat { background: rgba(16, 185, 129, 0.9); color: #fff; }
 .status-rencana { background: rgba(245, 158, 11, 0.9); color: #fff; }
 
+/* Label Tipe (Komik / Novel) di Pojok Kiri Bawah Poster */
+.type-pill {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+}
+
+.type-komik {
+    background: rgba(59, 130, 246, 0.9);
+    color: #fff;
+}
+
+.type-novel {
+    background: rgba(236, 72, 153, 0.9);
+    color: #fff;
+}
+
 /* Tombol Hapus di Pojok Kanan Atas Poster */
 .btn-hapus-card {
     position: absolute;
@@ -336,6 +448,32 @@ body {
 
 .btn-hapus-card:hover {
     background: #ef4444;
+    color: #fff;
+}
+
+/* Tombol Ganti Poster di Pojok Kanan Bawah Poster */
+.btn-ganti-poster {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(15, 15, 20, 0.8);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-ganti-poster:hover {
+    background: #6c47ff;
+    border-color: #6c47ff;
     color: #fff;
 }
 
@@ -539,4 +677,170 @@ body {
 
 .auth-footer a:hover {
     text-decoration: underline;
+}
+
+/* =========================================================================
+   6. RESPONSIF UNTUK HANDPHONE & LAYAR KECIL (MOBILE VERSION)
+   ========================================================================= */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .nav-brand h1 {
+        font-size: 18px;
+    }
+
+    .nav-actions {
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    #teks-user {
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+    }
+
+    .btn-tambah-nav {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .container {
+        margin: 16px auto;
+        padding: 0 14px;
+    }
+
+    .category-tabs {
+        gap: 8px;
+        padding: 6px;
+        margin-bottom: 14px;
+    }
+
+    .cat-btn {
+        padding: 10px 10px;
+        font-size: 13px;
+    }
+
+    .search-section {
+        padding: 14px;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .search-box {
+        min-width: 100%;
+    }
+
+    /* Filter status bisa digeser ke samping di layar HP */
+    .filter-tabs {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-tabs::-webkit-scrollbar {
+        height: 3px;
+    }
+
+    .filter-tabs::-webkit-scrollbar-thumb {
+        background: #2e2e3a;
+        border-radius: 4px;
+    }
+
+    .filter-btn {
+        flex: 0 0 auto;
+        padding: 8px 13px;
+        font-size: 12px;
+    }
+
+    .panel-tambah {
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Ukuran font 16px mencegah browser HP melakukan zoom otomatis saat mengetik */
+    .form-grid input,
+    .form-grid select,
+    .search-box input,
+    .auth-input-group input {
+        font-size: 16px;
+    }
+
+    .section-title h2 {
+        font-size: 16px;
+    }
+
+    /* Tampilan 2 kolom kartu komik/novel di layar HP seperti aplikasi baca komik */
+    .shinigami-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .card-body {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    .comic-title {
+        font-size: 13px;
+    }
+
+    .chapter-badge {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+
+    .btn-plus-ch {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+
+    .status-pill,
+    .type-pill {
+        font-size: 10px;
+        padding: 3px 7px;
+    }
+
+    .auth-card {
+        padding: 22px 18px 26px 18px;
+        border-radius: 18px;
+    }
+
+    .auth-close {
+        top: -10px;
+        right: -10px;
+        width: 34px;
+        height: 34px;
+    }
+}
+
+@media (max-width: 380px) {
+    /* Untuk layar HP yang sangat ramping */
+    #teks-user {
+        display: none;
+    }
+
+    .info-akun-nav {
+        padding: 4px;
+        background: transparent;
+        border: none;
+    }
+
+    .cat-btn {
+        font-size: 12px;
+        padding: 9px 6px;
+    }
 }
