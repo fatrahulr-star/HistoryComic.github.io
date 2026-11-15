@@ -57,7 +57,11 @@ const labelJudul = document.getElementById('label-judul');
 const inputJudul = document.getElementById('judul');
 const wadahVolume = document.getElementById('wadah-volume');
 const inputVolume = document.getElementById('volume');
+const wadahChapter = document.getElementById('wadah-chapter');
 const inputChapter = document.getElementById('chapter');
+const wadahHalamanBuku = document.getElementById('wadah-halaman-buku');
+const inputHalamanAwal = document.getElementById('halaman-awal');
+const inputHalamanAkhir = document.getElementById('halaman-akhir');
 const inputStatus = document.getElementById('status');
 const labelSampul = document.getElementById('label-sampul');
 const inputSampul = document.getElementById('sampul');
@@ -72,9 +76,15 @@ const btnTutupEdit = document.getElementById('btn-tutup-edit');
 const formEditInfo = document.getElementById('form-edit-info');
 const labelEditJudul = document.getElementById('label-edit-judul');
 const inputEditJudul = document.getElementById('input-edit-judul');
+const grupEditChapter = document.getElementById('grup-edit-chapter');
 const inputTambahChapter = document.getElementById('input-tambah-chapter');
 const teksChLama = document.getElementById('teks-ch-lama');
 const teksChBaru = document.getElementById('teks-ch-baru');
+const grupEditHalaman = document.getElementById('grup-edit-halaman');
+const editHalamanAwal = document.getElementById('edit-halaman-awal');
+const editHalamanAkhir = document.getElementById('edit-halaman-akhir');
+const inputTambahHalaman = document.getElementById('input-tambah-halaman');
+const teksHalPreview = document.getElementById('teks-hal-preview');
 const btnSimpanEdit = document.getElementById('btn-simpan-edit');
 const btnSimpanKomik = document.getElementById('btn-simpan-komik');
 const wadahDaftar = document.getElementById('daftar-komik');
@@ -82,32 +92,64 @@ const judulDaftar = document.getElementById('judul-daftar');
 const totalKomikBadge = document.getElementById('total-komik');
 const inputCari = document.getElementById('input-cari');
 const filterBtns = document.querySelectorAll('.filter-btn');
-const catBtns = document.querySelectorAll('.cat-btn');
+const tabKomik = document.getElementById('tab-komik');
+const tabNovel = document.getElementById('tab-novel');
+const cabangNovelBar = document.getElementById('cabang-novel-bar');
+const subNovelBtns = document.querySelectorAll('.sub-novel-btn');
 
 let modeDaftar = false;
 let filterAktif = 'Semua';
 let kategoriAktif = 'Komik';
+let subNovelAktif = 'Light Novel';
 let userSaatIni = null;
 let koleksiKomik = [];
 let idKomikGantiPoster = null;
 let tombolPosterAktif = null;
 let komikSedangDiedit = null;
 
-// Sesuaikan tampilan form berdasarkan pilihan Komik atau Novel
+function normalisasiKategori(kategoriData) {
+    if (!kategoriData) return 'Komik';
+    if (kategoriData === 'Novel') return 'Light Novel';
+    return kategoriData;
+}
+
+// Sesuaikan tampilan form berdasarkan pilihan Komik, Light Novel, atau Novel Biasa
 function sesuaikanFormKategori(tipe) {
     inputKategori.value = tipe;
-    if (tipe === 'Novel') {
-        judulFormTambah.textContent = 'Tambah Novel Baru';
-        labelJudul.textContent = 'Judul Novel';
+    if (tipe === 'Light Novel') {
+        judulFormTambah.textContent = 'Tambah Light Novel Baru';
+        labelJudul.textContent = 'Judul Light Novel';
         inputJudul.placeholder = 'Contoh: Omniscient Reader / Overlord';
         wadahVolume.style.display = 'block';
-        labelSampul.textContent = 'Poster / Sampul Novel';
+        wadahChapter.style.display = 'block';
+        inputChapter.required = true;
+        wadahHalamanBuku.style.display = 'none';
+        inputHalamanAwal.required = false;
+        inputHalamanAkhir.required = false;
+        labelSampul.textContent = 'Poster / Sampul Light Novel';
+    } else if (tipe === 'Novel Biasa') {
+        judulFormTambah.textContent = 'Tambah Novel Biasa (Buku Bacaan)';
+        labelJudul.textContent = 'Judul Novel / Buku Bacaan';
+        inputJudul.placeholder = 'Contoh: Laskar Pelangi / Bumi';
+        wadahVolume.style.display = 'none';
+        inputVolume.value = '';
+        wadahChapter.style.display = 'none';
+        inputChapter.required = false;
+        wadahHalamanBuku.style.display = 'grid';
+        inputHalamanAwal.required = true;
+        inputHalamanAkhir.required = true;
+        labelSampul.textContent = 'Poster / Sampul Buku Bacaan';
     } else {
         judulFormTambah.textContent = 'Tambah Komik Baru';
         labelJudul.textContent = 'Judul Komik';
         inputJudul.placeholder = 'Contoh: Solo Leveling';
         wadahVolume.style.display = 'none';
         inputVolume.value = '';
+        wadahChapter.style.display = 'block';
+        inputChapter.required = true;
+        wadahHalamanBuku.style.display = 'none';
+        inputHalamanAwal.required = false;
+        inputHalamanAkhir.required = false;
         labelSampul.textContent = 'Poster / Sampul Komik';
     }
 }
@@ -220,18 +262,18 @@ async function muatKomikDariCloud() {
     tampilkanKomik();
 }
 
-// 6. TAMPILKAN GRID KOMIK / NOVEL SESUAI TAB HALAMAN AKTIF
+// 6. TAMPILKAN GRID KOMIK / LIGHT NOVEL / NOVEL BIASA SESUAI TAB AKTIF
 function tampilkanKomik() {
     wadahDaftar.innerHTML = '';
     const kataKunci = inputCari.value.toLowerCase();
 
-    // Update teks UI berdasarkan tab halaman utama yang aktif (Komik vs Novel)
+    // Update teks UI berdasarkan tab yang aktif (Komik / Light Novel / Novel Biasa)
     btnBukaTambah.textContent = `+ Tambah ${kategoriAktif}`;
     inputCari.placeholder = `Cari judul ${kategoriAktif.toLowerCase()} di koleksimu...`;
     judulDaftar.textContent = `Daftar Koleksi ${kategoriAktif}`;
 
     const komikTersaring = koleksiKomik.filter((komik) => {
-        const tipeBacaan = komik.kategori || 'Komik';
+        const tipeBacaan = normalisasiKategori(komik.kategori);
         const cocokJudul = komik.judul.toLowerCase().includes(kataKunci);
         const cocokStatus = filterAktif === 'Semua' || komik.status === filterAktif;
         const cocokKategori = tipeBacaan === kategoriAktif;
@@ -249,10 +291,19 @@ function tampilkanKomik() {
         const kartu = document.createElement('div');
         kartu.className = 'comic-card';
 
-        const tipeBacaan = komik.kategori || 'Komik';
-        const isNovel = tipeBacaan === 'Novel';
-        const kelasTipe = isNovel ? 'type-novel' : 'type-komik';
-        const ikonTipe = isNovel ? '📖' : '📘';
+        const tipeBacaan = normalisasiKategori(komik.kategori);
+        const isLightNovel = tipeBacaan === 'Light Novel';
+        const isNovelBiasa = tipeBacaan === 'Novel Biasa';
+
+        let kelasTipe = 'type-komik';
+        let ikonTipe = '📘';
+        if (isLightNovel) {
+            kelasTipe = 'type-novel';
+            ikonTipe = '✨';
+        } else if (isNovelBiasa) {
+            kelasTipe = 'type-novel-biasa';
+            ikonTipe = '📕';
+        }
 
         let kelasStatus = 'status-reading';
         let labelStatus = 'Reading';
@@ -268,10 +319,24 @@ function tampilkanKomik() {
             ? `<img src="${komik.sampul}" alt="${bersihkanTeks(komik.judul)}">`
             : `<div class="poster-placeholder">${ikonTipe}</div>`;
 
-        // Jika Novel dan memiliki data Volume, tampilkan "Vol. X • Ch. Y"
-        const teksChapter = (isNovel && komik.volume)
-            ? `Vol. ${komik.volume} • Ch. ${komik.chapter}`
-            : `Ch. ${komik.chapter}`;
+        // Format teks progress bacaan
+        let teksChapter = '';
+        let aksiTambahHTML = '';
+        let labelEditCabang = '📝 Edit Nama & Chapter';
+
+        if (isNovelBiasa) {
+            const halAwal = komik.halamanAwal || 1;
+            const halAkhir = komik.halamanAkhir || komik.chapter || 1;
+            teksChapter = `Hal. ${halAwal} - ${halAkhir}`;
+            aksiTambahHTML = `<button class="btn-plus-ch" onclick="tambahHalaman('${komik.id}', ${halAkhir})" title="Tambah 1 Halaman">+1</button>`;
+            labelEditCabang = '📝 Edit Nama & Halaman';
+        } else if (isLightNovel && komik.volume) {
+            teksChapter = `Vol. ${komik.volume} • Ch. ${komik.chapter}`;
+            aksiTambahHTML = `<button class="btn-plus-ch" onclick="tambahChapter('${komik.id}', ${komik.chapter})" title="Tambah 1 Chapter">+1</button>`;
+        } else {
+            teksChapter = `Ch. ${komik.chapter}`;
+            aksiTambahHTML = `<button class="btn-plus-ch" onclick="tambahChapter('${komik.id}', ${komik.chapter})" title="Tambah 1 Chapter">+1</button>`;
+        }
 
         kartu.innerHTML = `
             <div class="poster-wrapper">
@@ -282,14 +347,14 @@ function tampilkanKomik() {
                 <button class="btn-menu-edit" onclick="toggleMenuEdit(event, '${komik.id}')" title="Menu Edit ${tipeBacaan}">✏️</button>
                 <div id="menu-edit-${komik.id}" class="cabang-edit-menu">
                     <button type="button" class="cabang-edit-item" onclick="pilihGambarBaru('${komik.id}', this)">📷 Edit Foto</button>
-                    <button type="button" class="cabang-edit-item" onclick="bukaModalEdit('${komik.id}')">📝 Edit Nama & Chapter</button>
+                    <button type="button" class="cabang-edit-item" onclick="bukaModalEdit('${komik.id}')">${labelEditCabang}</button>
                 </div>
             </div>
             <div class="card-body">
                 <h3 class="comic-title" title="${bersihkanTeks(komik.judul)}">${bersihkanTeks(komik.judul)}</h3>
                 <div class="chapter-row">
                     <span class="chapter-badge">${teksChapter}</span>
-                    <button class="btn-plus-ch" onclick="tambahChapter('${komik.id}', ${komik.chapter})" title="Tambah 1 Chapter">+1</button>
+                    ${aksiTambahHTML}
                 </div>
             </div>
         `;
@@ -358,15 +423,38 @@ btnBukaTambah.addEventListener('click', () => {
 });
 btnTutupTambah.addEventListener('click', () => panelTambah.style.display = 'none');
 
+function sinkronkanTabDenganKategori(tipe) {
+    kategoriAktif = tipe;
+    if (tipe === 'Komik') {
+        tabKomik.classList.add('active');
+        tabNovel.classList.remove('active');
+        cabangNovelBar.style.display = 'none';
+    } else {
+        subNovelAktif = tipe;
+        tabKomik.classList.remove('active');
+        tabNovel.classList.add('active');
+        cabangNovelBar.style.display = 'grid';
+        subNovelBtns.forEach((b) => {
+            b.classList.toggle('active', b.getAttribute('data-subnovel') === subNovelAktif);
+        });
+    }
+    sesuaikanFormKategori(kategoriAktif);
+}
+
 formKomik.addEventListener('submit', async (e) => {
     e.preventDefault();
     btnSimpanKomik.textContent = 'Menyimpan ke Cloud...';
     btnSimpanKomik.disabled = true;
 
     const tipeDipilih = inputKategori.value;
-    const nilaiVolume = (tipeDipilih === 'Novel' && inputVolume.value.trim() !== '')
+    const nilaiVolume = (tipeDipilih === 'Light Novel' && inputVolume.value.trim() !== '')
         ? Number(inputVolume.value)
         : null;
+
+    const isNovelBiasa = tipeDipilih === 'Novel Biasa';
+    const halAwal = isNovelBiasa ? (Number(inputHalamanAwal.value) || 1) : null;
+    const halAkhir = isNovelBiasa ? (Number(inputHalamanAkhir.value) || 1) : null;
+    const nilaiChapter = isNovelBiasa ? halAkhir : (Number(inputChapter.value) || 0);
 
     let dataFoto = null;
     if (inputSampul.files && inputSampul.files[0]) {
@@ -378,7 +466,9 @@ formKomik.addEventListener('submit', async (e) => {
         kategori: tipeDipilih,
         judul: inputJudul.value.trim(),
         volume: nilaiVolume,
-        chapter: Number(inputChapter.value),
+        chapter: nilaiChapter,
+        halamanAwal: halAwal,
+        halamanAkhir: halAkhir,
         status: inputStatus.value,
         sampul: dataFoto
     });
@@ -389,17 +479,12 @@ formKomik.addEventListener('submit', async (e) => {
     btnSimpanKomik.disabled = false;
     panelTambah.style.display = 'none';
 
-    // Pindahkan ke tab halaman sesuai bacaan yang baru disimpan
-    kategoriAktif = tipeDipilih;
-    catBtns.forEach((b) => {
-        b.classList.toggle('active', b.getAttribute('data-kategori') === kategoriAktif);
-    });
-    sesuaikanFormKategori(kategoriAktif);
-
+    // Pindahkan ke tab sesuai bacaan yang baru disimpan
+    sinkronkanTabDenganKategori(tipeDipilih);
     muatKomikDariCloud();
 });
 
-// 8. MENU EDIT BERCABANG (1. EDIT FOTO, 2. EDIT NAMA & TAMBAHAN CHAPTER) & HAPUS DI CLOUD
+// 8. MENU EDIT BERCABANG (1. EDIT FOTO, 2. EDIT NAMA & CHAPTER / HALAMAN) & HAPUS DI CLOUD
 function tutupSemuaMenuEdit() {
     document.querySelectorAll('.cabang-edit-menu.terbuka').forEach((menu) => {
         menu.classList.remove('terbuka');
@@ -462,20 +547,41 @@ inputGantiSampul.addEventListener('change', async () => {
     }
 });
 
-// Cabang 2: Edit Nama Komik/Novel & Tambahan Chapter yang Sudah Dibaca
+// Cabang 2: Edit Nama Komik/Novel & Tambahan Chapter / Rentang Halaman
+function updatePreviewHalamanEdit() {
+    const awal = Math.max(1, Number(editHalamanAwal.value) || 1);
+    const akhirDasar = Math.max(1, Number(editHalamanAkhir.value) || 1);
+    const tambahan = Math.max(0, Number(inputTambahHalaman.value) || 0);
+    const akhirTotal = akhirDasar + tambahan;
+    teksHalPreview.textContent = `Hal. ${awal} - ${akhirTotal}`;
+}
+
 window.bukaModalEdit = (idDokumen) => {
     tutupSemuaMenuEdit();
     const data = koleksiKomik.find((item) => item.id === idDokumen);
     if (!data) return;
 
     komikSedangDiedit = data;
-    const tipe = data.kategori || 'Komik';
+    const tipe = normalisasiKategori(data.kategori);
     judulModalEdit.textContent = `Edit ${tipe}`;
     labelEditJudul.textContent = `Nama / Judul ${tipe}`;
     inputEditJudul.value = data.judul;
-    inputTambahChapter.value = 0;
-    teksChLama.textContent = `Ch. ${data.chapter}`;
-    teksChBaru.textContent = `Ch. ${data.chapter}`;
+
+    if (tipe === 'Novel Biasa') {
+        grupEditChapter.style.display = 'none';
+        grupEditHalaman.style.display = 'block';
+        editHalamanAwal.value = data.halamanAwal || 1;
+        editHalamanAkhir.value = data.halamanAkhir || data.chapter || 1;
+        inputTambahHalaman.value = 0;
+        updatePreviewHalamanEdit();
+    } else {
+        grupEditChapter.style.display = 'block';
+        grupEditHalaman.style.display = 'none';
+        inputTambahChapter.value = 0;
+        teksChLama.textContent = `Ch. ${data.chapter}`;
+        teksChBaru.textContent = `Ch. ${data.chapter}`;
+    }
+
     modalEdit.style.display = 'flex';
 };
 
@@ -485,6 +591,10 @@ inputTambahChapter.addEventListener('input', () => {
     const totalBaru = Number(komikSedangDiedit.chapter) + tambahan;
     teksChBaru.textContent = `Ch. ${totalBaru}`;
 });
+
+editHalamanAwal.addEventListener('input', updatePreviewHalamanEdit);
+editHalamanAkhir.addEventListener('input', updatePreviewHalamanEdit);
+inputTambahHalaman.addEventListener('input', updatePreviewHalamanEdit);
 
 btnTutupEdit.addEventListener('click', () => {
     modalEdit.style.display = 'none';
@@ -506,14 +616,32 @@ formEditInfo.addEventListener('submit', async (e) => {
     btnSimpanEdit.disabled = true;
 
     const judulBaru = inputEditJudul.value.trim();
-    const tambahanCh = Math.max(0, Number(inputTambahChapter.value) || 0);
-    const chapterBaru = Number(komikSedangDiedit.chapter) + tambahanCh;
+    const tipe = normalisasiKategori(komikSedangDiedit.kategori);
 
     try {
-        await updateDoc(doc(db, "koleksi_komik", komikSedangDiedit.id), {
-            judul: judulBaru,
-            chapter: chapterBaru
-        });
+        if (tipe === 'Novel Biasa') {
+            const awalBaru = Math.max(1, Number(editHalamanAwal.value) || 1);
+            const akhirDasar = Math.max(1, Number(editHalamanAkhir.value) || 1);
+            const tambahanHal = Math.max(0, Number(inputTambahHalaman.value) || 0);
+            const akhirBaru = akhirDasar + tambahanHal;
+
+            await updateDoc(doc(db, "koleksi_komik", komikSedangDiedit.id), {
+                kategori: 'Novel Biasa',
+                judul: judulBaru,
+                halamanAwal: awalBaru,
+                halamanAkhir: akhirBaru,
+                chapter: akhirBaru
+            });
+        } else {
+            const tambahanCh = Math.max(0, Number(inputTambahChapter.value) || 0);
+            const chapterBaru = Number(komikSedangDiedit.chapter) + tambahanCh;
+
+            await updateDoc(doc(db, "koleksi_komik", komikSedangDiedit.id), {
+                judul: judulBaru,
+                chapter: chapterBaru
+            });
+        }
+
         modalEdit.style.display = 'none';
         komikSedangDiedit = null;
         await muatKomikDariCloud();
@@ -526,6 +654,15 @@ formEditInfo.addEventListener('submit', async (e) => {
 window.tambahChapter = async (idDokumen, chapterSekarang) => {
     await updateDoc(doc(db, "koleksi_komik", idDokumen), {
         chapter: chapterSekarang + 1
+    });
+    muatKomikDariCloud();
+};
+
+window.tambahHalaman = async (idDokumen, halamanAkhirSekarang) => {
+    const baru = halamanAkhirSekarang + 1;
+    await updateDoc(doc(db, "koleksi_komik", idDokumen), {
+        halamanAkhir: baru,
+        chapter: baru
     });
     muatKomikDariCloud();
 };
@@ -545,12 +682,21 @@ filterBtns.forEach((btn) => {
     });
 });
 
-catBtns.forEach((btn) => {
+// Navigasi Tab Komik vs Novel (Bercabang ke Light Novel & Novel Biasa)
+tabKomik.addEventListener('click', () => {
+    sinkronkanTabDenganKategori('Komik');
+    tampilkanKomik();
+});
+
+tabNovel.addEventListener('click', () => {
+    sinkronkanTabDenganKategori(subNovelAktif);
+    tampilkanKomik();
+});
+
+subNovelBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-        catBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        kategoriAktif = btn.getAttribute('data-kategori');
-        sesuaikanFormKategori(kategoriAktif);
+        const pilihan = btn.getAttribute('data-subnovel');
+        sinkronkanTabDenganKategori(pilihan);
         tampilkanKomik();
     });
 });

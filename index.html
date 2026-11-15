@@ -26,10 +26,16 @@
 
     <!-- KONTEN UTAMA -->
     <main class="container">
-        <!-- 2 Tab Halaman Utama Terpisah: Halaman Komik & Halaman Novel -->
+        <!-- 2 Tab Utama: Komik & Novel (Bercabang menjadi Light Novel & Novel Biasa) -->
         <div class="category-tabs">
-            <button class="cat-btn active" data-kategori="Komik">📘 Halaman Komik</button>
-            <button class="cat-btn" data-kategori="Novel">📖 Halaman Novel</button>
+            <button type="button" class="cat-btn active" id="tab-komik" data-kategori="Komik">📘 Komik</button>
+            <button type="button" class="cat-btn" id="tab-novel" data-kategori="Novel">📖 Novel ▾</button>
+        </div>
+
+        <!-- Cabang Pilihan Novel: Light Novel & Novel Biasa -->
+        <div id="cabang-novel-bar" class="cabang-novel-bar" style="display: none;">
+            <button type="button" class="sub-novel-btn active" data-subnovel="Light Novel">✨ Light Novel</button>
+            <button type="button" class="sub-novel-btn" data-subnovel="Novel Biasa">📕 Novel Biasa (Buku Bacaan)</button>
         </div>
 
         <section class="search-section">
@@ -44,7 +50,7 @@
             </div>
         </section>
 
-        <!-- Form Tambah Komik / Novel -->
+        <!-- Form Tambah Komik / Light Novel / Novel Biasa -->
         <section id="panel-tambah" class="panel-tambah" style="display: none;">
             <div class="panel-header">
                 <h2 id="judul-form-tambah">Tambah Komik Baru</h2>
@@ -55,7 +61,8 @@
                     <label>Jenis Bacaan</label>
                     <select id="kategori">
                         <option value="Komik">📘 Komik (Manga / Manhwa / Manhua)</option>
-                        <option value="Novel">📖 Novel (Light Novel / Web Novel)</option>
+                        <option value="Light Novel">✨ Light Novel (Web Novel / LN)</option>
+                        <option value="Novel Biasa">📕 Novel Biasa (Buku Bacaan Biasa)</option>
                     </select>
                 </div>
                 <div>
@@ -66,9 +73,19 @@
                     <label>Volume (Opsional)</label>
                     <input type="number" id="volume" placeholder="Contoh: 3 (Kosongkan jika tidak ada)" min="1">
                 </div>
-                <div>
+                <div id="wadah-chapter">
                     <label>Chapter Terakhir</label>
                     <input type="number" id="chapter" placeholder="Contoh: 110" min="0" required>
+                </div>
+                <div id="wadah-halaman-buku" class="rentang-halaman-grid" style="display: none;">
+                    <div>
+                        <label>Dari Halaman</label>
+                        <input type="number" id="halaman-awal" placeholder="Contoh: 1" min="1">
+                    </div>
+                    <div>
+                        <label>Sampai Halaman</label>
+                        <input type="number" id="halaman-akhir" placeholder="Contoh: 45" min="1">
+                    </div>
                 </div>
                 <div>
                     <label>Status Baca</label>
@@ -105,7 +122,7 @@
         <input type="file" id="input-ganti-sampul" accept="image/*" style="display: none;">
     </main>
 
-    <!-- MODAL EDIT NAMA & TAMBAHAN CHAPTER -->
+    <!-- MODAL EDIT NAMA & TAMBAHAN CHAPTER / HALAMAN -->
     <div id="modal-edit" class="modal-overlay" style="display: none;">
         <div class="auth-card edit-card">
             <div class="panel-header" style="margin-bottom: 16px;">
@@ -117,13 +134,33 @@
                     <label id="label-edit-judul">Nama / Judul Komik</label>
                     <input type="text" id="input-edit-judul" placeholder="Masukkan judul..." required>
                 </div>
-                <div class="edit-field-group">
+                <!-- Untuk Komik & Light Novel (Chapter) -->
+                <div id="grup-edit-chapter" class="edit-field-group">
                     <label>Tambahan Chapter yang Sudah Dibaca</label>
-                    <input type="number" id="input-tambah-chapter" placeholder="Contoh: 5 (Ketik 0 jika tidak menambah)" value="0" min="0" required>
+                    <input type="number" id="input-tambah-chapter" placeholder="Contoh: 5 (Ketik 0 jika tidak menambah)" value="0" min="0">
                     <div class="info-kalkulasi-ch">
                         <span>Chapter saat ini: <strong id="teks-ch-lama">0</strong></span>
                         <span>➔</span>
                         <span>Menjadi: <strong id="teks-ch-baru" class="highlight-ch">0</strong></span>
+                    </div>
+                </div>
+                <!-- Untuk Novel Biasa / Buku Bacaan Biasa (Dari Halaman ... Sampai Halaman ...) -->
+                <div id="grup-edit-halaman" class="edit-field-group" style="display: none;">
+                    <div class="rentang-halaman-edit">
+                        <div>
+                            <label>Dari Halaman</label>
+                            <input type="number" id="edit-halaman-awal" placeholder="Contoh: 1" min="1">
+                        </div>
+                        <div>
+                            <label>Sampai Halaman</label>
+                            <input type="number" id="edit-halaman-akhir" placeholder="Contoh: 50" min="1">
+                        </div>
+                    </div>
+                    <label style="margin-top: 12px;">Atau Tambah Halaman yang Baru Dibaca (+ Halaman)</label>
+                    <input type="number" id="input-tambah-halaman" placeholder="Contoh: 10 (Otomatis menambah halaman akhir)" value="0" min="0">
+                    <div class="info-kalkulasi-ch">
+                        <span>Rentang Halaman:</span>
+                        <strong id="teks-hal-preview" class="highlight-ch">Hal. 1 - 1</strong>
                     </div>
                 </div>
                 <button type="submit" id="btn-simpan-edit" class="btn-simpan-komik" style="margin-top: 8px;">Simpan Perubahan</button>
