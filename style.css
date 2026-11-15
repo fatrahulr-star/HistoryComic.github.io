@@ -451,30 +451,133 @@ body {
     color: #fff;
 }
 
-/* Tombol Ganti Poster di Pojok Kanan Bawah Poster */
-.btn-ganti-poster {
+/* Tombol Menu Edit Bercabang di Pojok Kanan Bawah Poster */
+.btn-menu-edit {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background: rgba(15, 15, 20, 0.8);
+    background: rgba(15, 15, 20, 0.85);
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
     cursor: pointer;
     font-size: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(6px);
-    transition: background 0.2s, border-color 0.2s;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    z-index: 5;
 }
 
-.btn-ganti-poster:hover {
+.btn-menu-edit:hover,
+.btn-menu-edit.active {
     background: #6c47ff;
     border-color: #6c47ff;
     color: #fff;
+}
+
+/* Cabang Pilihan Edit (1. Edit Foto, 2. Edit Nama & +Chapter) */
+.cabang-edit-menu {
+    position: absolute;
+    bottom: 46px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 6;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px) scale(0.95);
+    transform-origin: bottom right;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.cabang-edit-menu.terbuka {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.cabang-edit-item {
+    background: rgba(18, 18, 25, 0.95);
+    color: #f4f4f6;
+    border: 1px solid rgba(108, 71, 255, 0.45);
+    padding: 7px 11px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+    transition: background 0.18s, border-color 0.18s, transform 0.15s;
+}
+
+.cabang-edit-item:hover {
+    background: #6c47ff;
+    border-color: #6c47ff;
+    color: #ffffff;
+    transform: translateX(-2px);
+}
+
+/* Modal Edit Nama & Tambahan Chapter */
+.edit-card {
+    max-width: 390px;
+}
+
+.edit-field-group {
+    margin-bottom: 15px;
+}
+
+.edit-field-group label {
+    display: block;
+    font-size: 13px;
+    color: #a1a1aa;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.edit-field-group input {
+    width: 100%;
+    background-color: #202028;
+    border: 1px solid #323240;
+    color: #ffffff;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+}
+
+.edit-field-group input:focus {
+    border-color: #6c47ff;
+}
+
+.info-kalkulasi-ch {
+    margin-top: 8px;
+    background: #1c1c24;
+    border: 1px solid #2b2b38;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #a1a1aa;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.info-kalkulasi-ch strong {
+    color: #ffffff;
+}
+
+.info-kalkulasi-ch .highlight-ch {
+    color: #8b6eff;
+    font-size: 13px;
 }
 
 /* Bagian Informasi di Bawah Poster */
@@ -775,8 +878,14 @@ body {
     .form-grid input,
     .form-grid select,
     .search-box input,
-    .auth-input-group input {
+    .auth-input-group input,
+    .edit-field-group input {
         font-size: 16px;
+    }
+
+    .cabang-edit-item {
+        font-size: 11px;
+        padding: 6px 9px;
     }
 
     .section-title h2 {

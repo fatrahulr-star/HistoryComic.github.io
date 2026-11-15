@@ -66,6 +66,16 @@ const previewSampulImg = document.getElementById('preview-sampul-img');
 const btnUbahSampulForm = document.getElementById('btn-ubah-sampul-form');
 const btnHapusSampulForm = document.getElementById('btn-hapus-sampul-form');
 const inputGantiSampul = document.getElementById('input-ganti-sampul');
+const modalEdit = document.getElementById('modal-edit');
+const judulModalEdit = document.getElementById('judul-modal-edit');
+const btnTutupEdit = document.getElementById('btn-tutup-edit');
+const formEditInfo = document.getElementById('form-edit-info');
+const labelEditJudul = document.getElementById('label-edit-judul');
+const inputEditJudul = document.getElementById('input-edit-judul');
+const inputTambahChapter = document.getElementById('input-tambah-chapter');
+const teksChLama = document.getElementById('teks-ch-lama');
+const teksChBaru = document.getElementById('teks-ch-baru');
+const btnSimpanEdit = document.getElementById('btn-simpan-edit');
 const btnSimpanKomik = document.getElementById('btn-simpan-komik');
 const wadahDaftar = document.getElementById('daftar-komik');
 const judulDaftar = document.getElementById('judul-daftar');
@@ -81,6 +91,7 @@ let userSaatIni = null;
 let koleksiKomik = [];
 let idKomikGantiPoster = null;
 let tombolPosterAktif = null;
+let komikSedangDiedit = null;
 
 // Sesuaikan tampilan form berdasarkan pilihan Komik atau Novel
 function sesuaikanFormKategori(tipe) {
@@ -268,7 +279,11 @@ function tampilkanKomik() {
                 <span class="status-pill ${kelasStatus}">${labelStatus}</span>
                 <span class="type-pill ${kelasTipe}">${ikonTipe} ${tipeBacaan}</span>
                 <button class="btn-hapus-card" onclick="hapusKomik('${komik.id}')" title="Hapus ${tipeBacaan}">🗑️</button>
-                <button class="btn-ganti-poster" onclick="pilihGambarBaru('${komik.id}', this)" title="Ganti Gambar Poster ${tipeBacaan}">📷</button>
+                <button class="btn-menu-edit" onclick="toggleMenuEdit(event, '${komik.id}')" title="Menu Edit ${tipeBacaan}">✏️</button>
+                <div id="menu-edit-${komik.id}" class="cabang-edit-menu">
+                    <button type="button" class="cabang-edit-item" onclick="pilihGambarBaru('${komik.id}', this)">📷 Edit Foto</button>
+                    <button type="button" class="cabang-edit-item" onclick="bukaModalEdit('${komik.id}')">📝 Edit Nama & Chapter</button>
+                </div>
             </div>
             <div class="card-body">
                 <h3 class="comic-title" title="${bersihkanTeks(komik.judul)}">${bersihkanTeks(komik.judul)}</h3>
@@ -384,8 +399,37 @@ formKomik.addEventListener('submit', async (e) => {
     muatKomikDariCloud();
 });
 
-// 8. UPDATE CHAPTER, GANTI POSTER & HAPUS DI CLOUD
+// 8. MENU EDIT BERCABANG (1. EDIT FOTO, 2. EDIT NAMA & TAMBAHAN CHAPTER) & HAPUS DI CLOUD
+function tutupSemuaMenuEdit() {
+    document.querySelectorAll('.cabang-edit-menu.terbuka').forEach((menu) => {
+        menu.classList.remove('terbuka');
+    });
+    document.querySelectorAll('.btn-menu-edit.active').forEach((btn) => {
+        btn.classList.remove('active');
+    });
+}
+
+window.toggleMenuEdit = (event, idDokumen) => {
+    event.stopPropagation();
+    const menuTarget = document.getElementById(`menu-edit-${idDokumen}`);
+    const tombolKlik = event.currentTarget;
+    const sedangTerbuka = menuTarget && menuTarget.classList.contains('terbuka');
+
+    tutupSemuaMenuEdit();
+
+    if (menuTarget && !sedangTerbuka) {
+        menuTarget.classList.add('terbuka');
+        tombolKlik.classList.add('active');
+    }
+};
+
+document.addEventListener('click', () => {
+    tutupSemuaMenuEdit();
+});
+
+// Cabang 1: Edit Foto Poster
 window.pilihGambarBaru = (idDokumen, elemenTombol) => {
+    tutupSemuaMenuEdit();
     idKomikGantiPoster = idDokumen;
     tombolPosterAktif = elemenTombol;
     inputGantiSampul.value = '';
@@ -396,7 +440,7 @@ inputGantiSampul.addEventListener('change', async () => {
     if (!inputGantiSampul.files || !inputGantiSampul.files[0] || !idKomikGantiPoster) return;
 
     if (tombolPosterAktif) {
-        tombolPosterAktif.textContent = '⏳';
+        tombolPosterAktif.textContent = '⏳ Menyimpan...';
         tombolPosterAktif.disabled = true;
     }
 
@@ -408,13 +452,74 @@ inputGantiSampul.addEventListener('change', async () => {
         await muatKomikDariCloud();
     } catch (error) {
         if (tombolPosterAktif) {
-            tombolPosterAktif.textContent = '📷';
+            tombolPosterAktif.textContent = '📷 Edit Foto';
             tombolPosterAktif.disabled = false;
         }
     } finally {
         idKomikGantiPoster = null;
         tombolPosterAktif = null;
         inputGantiSampul.value = '';
+    }
+});
+
+// Cabang 2: Edit Nama Komik/Novel & Tambahan Chapter yang Sudah Dibaca
+window.bukaModalEdit = (idDokumen) => {
+    tutupSemuaMenuEdit();
+    const data = koleksiKomik.find((item) => item.id === idDokumen);
+    if (!data) return;
+
+    komikSedangDiedit = data;
+    const tipe = data.kategori || 'Komik';
+    judulModalEdit.textContent = `Edit ${tipe}`;
+    labelEditJudul.textContent = `Nama / Judul ${tipe}`;
+    inputEditJudul.value = data.judul;
+    inputTambahChapter.value = 0;
+    teksChLama.textContent = `Ch. ${data.chapter}`;
+    teksChBaru.textContent = `Ch. ${data.chapter}`;
+    modalEdit.style.display = 'flex';
+};
+
+inputTambahChapter.addEventListener('input', () => {
+    if (!komikSedangDiedit) return;
+    const tambahan = Math.max(0, Number(inputTambahChapter.value) || 0);
+    const totalBaru = Number(komikSedangDiedit.chapter) + tambahan;
+    teksChBaru.textContent = `Ch. ${totalBaru}`;
+});
+
+btnTutupEdit.addEventListener('click', () => {
+    modalEdit.style.display = 'none';
+    komikSedangDiedit = null;
+});
+
+modalEdit.addEventListener('click', (e) => {
+    if (e.target === modalEdit) {
+        modalEdit.style.display = 'none';
+        komikSedangDiedit = null;
+    }
+});
+
+formEditInfo.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!komikSedangDiedit) return;
+
+    btnSimpanEdit.textContent = 'Menyimpan...';
+    btnSimpanEdit.disabled = true;
+
+    const judulBaru = inputEditJudul.value.trim();
+    const tambahanCh = Math.max(0, Number(inputTambahChapter.value) || 0);
+    const chapterBaru = Number(komikSedangDiedit.chapter) + tambahanCh;
+
+    try {
+        await updateDoc(doc(db, "koleksi_komik", komikSedangDiedit.id), {
+            judul: judulBaru,
+            chapter: chapterBaru
+        });
+        modalEdit.style.display = 'none';
+        komikSedangDiedit = null;
+        await muatKomikDariCloud();
+    } finally {
+        btnSimpanEdit.textContent = 'Simpan Perubahan';
+        btnSimpanEdit.disabled = false;
     }
 });
 
