@@ -27,7 +27,7 @@ const googleProvider = new GoogleAuthProvider();
 // Fungsi Anti-XSS untuk keamanan teks
 function bersihkanTeks(teks) {
     const div = document.createElement('div');
-    div.textContent = teks;
+    div.textContent = teks || '';
     return div.innerHTML;
 }
 
@@ -62,7 +62,17 @@ const inputChapter = document.getElementById('chapter');
 const wadahHalamanBuku = document.getElementById('wadah-halaman-buku');
 const inputHalamanAwal = document.getElementById('halaman-awal');
 const inputHalamanAkhir = document.getElementById('halaman-akhir');
+const wadahLaguSosmed = document.getElementById('wadah-lagu-sosmed');
+const inputArtisLagu = document.getElementById('artis-lagu');
+const inputTimestampLagu = document.getElementById('timestamp-lagu');
+const inputPlatformLagu = document.getElementById('platform-lagu');
+const inputLinkLagu = document.getElementById('link-lagu');
+const inputCatatanLagu = document.getElementById('catatan-lagu');
+const labelStatus = document.getElementById('label-status');
 const inputStatus = document.getElementById('status');
+const optStatusReading = document.getElementById('opt-status-reading');
+const optStatusCompleted = document.getElementById('opt-status-completed');
+const optStatusPlan = document.getElementById('opt-status-plan');
 const labelSampul = document.getElementById('label-sampul');
 const inputSampul = document.getElementById('sampul');
 const previewSampulWadah = document.getElementById('preview-sampul-wadah');
@@ -70,6 +80,8 @@ const previewSampulImg = document.getElementById('preview-sampul-img');
 const btnUbahSampulForm = document.getElementById('btn-ubah-sampul-form');
 const btnHapusSampulForm = document.getElementById('btn-hapus-sampul-form');
 const inputGantiSampul = document.getElementById('input-ganti-sampul');
+const showcaseAudioWadah = document.getElementById('showcase-audio-wadah');
+
 const modalEdit = document.getElementById('modal-edit');
 const judulModalEdit = document.getElementById('judul-modal-edit');
 const btnTutupEdit = document.getElementById('btn-tutup-edit');
@@ -85,21 +97,35 @@ const editHalamanAwal = document.getElementById('edit-halaman-awal');
 const editHalamanAkhir = document.getElementById('edit-halaman-akhir');
 const inputTambahHalaman = document.getElementById('input-tambah-halaman');
 const teksHalPreview = document.getElementById('teks-hal-preview');
+const grupEditLagu = document.getElementById('grup-edit-lagu');
+const editArtisLagu = document.getElementById('edit-artis-lagu');
+const editTimestampLagu = document.getElementById('edit-timestamp-lagu');
+const editPlatformLagu = document.getElementById('edit-platform-lagu');
+const editLinkLagu = document.getElementById('edit-link-lagu');
+const editCatatanLagu = document.getElementById('edit-catatan-lagu');
+const editStatusLagu = document.getElementById('edit-status-lagu');
 const btnSimpanEdit = document.getElementById('btn-simpan-edit');
+
 const btnSimpanKomik = document.getElementById('btn-simpan-komik');
 const wadahDaftar = document.getElementById('daftar-komik');
 const judulDaftar = document.getElementById('judul-daftar');
 const totalKomikBadge = document.getElementById('total-komik');
 const inputCari = document.getElementById('input-cari');
 const filterBtns = document.querySelectorAll('.filter-btn');
+const filterReadingBtn = document.getElementById('filter-reading');
+const filterCompletedBtn = document.getElementById('filter-completed');
+const filterPlanBtn = document.getElementById('filter-plan');
+
 const tabKomik = document.getElementById('tab-komik');
 const tabNovel = document.getElementById('tab-novel');
 const tabBuku = document.getElementById('tab-buku');
+const tabLagu = document.getElementById('tab-lagu');
 const cabangNovelBar = document.getElementById('cabang-novel-bar');
 const subNovelBtns = document.querySelectorAll('.sub-novel-btn');
 
 let modeDaftar = false;
 let filterAktif = 'Semua';
+let filterPlatformSosmed = 'All';
 let kategoriAktif = 'Komik';
 let subNovelAktif = 'Light Novel';
 let userSaatIni = null;
@@ -114,9 +140,39 @@ function normalisasiKategori(kategoriData) {
     return kategoriData;
 }
 
-// Sesuaikan tampilan form berdasarkan pilihan Komik, Light Novel, Novel Biasa, atau Buku Bacaan Biasa
+function perbaruiLabelStatusUI(tipe) {
+    const isLagu = tipe === 'Lagu / Soundtrack';
+    if (isLagu) {
+        labelStatus.textContent = 'Status Audio Sosmed';
+        optStatusReading.textContent = '🎧 Favorit / Sering Dipakai (On Repeat)';
+        optStatusCompleted.textContent = '✅ Sudah Dipakai di Status (Used)';
+        optStatusPlan.textContent = '📌 Siap Dipakai Status (Saved)';
+    } else {
+        labelStatus.textContent = 'Status Baca';
+        optStatusReading.textContent = 'Sedang Dibaca (Reading)';
+        optStatusCompleted.textContent = 'Sudah Tamat (Completed)';
+        optStatusPlan.textContent = 'Rencana Baca (Plan)';
+    }
+}
+
+function perbaruiLabelFilterTab(tipe) {
+    const isLagu = tipe === 'Lagu / Soundtrack';
+    if (isLagu) {
+        filterReadingBtn.textContent = '🎧 Favorit';
+        filterCompletedBtn.textContent = '✅ Sudah Dipakai';
+        filterPlanBtn.textContent = '📌 Siap Pakai';
+    } else {
+        filterReadingBtn.textContent = 'Reading';
+        filterCompletedBtn.textContent = 'Completed';
+        filterPlanBtn.textContent = 'Plan to Read';
+    }
+}
+
+// Sesuaikan tampilan form berdasarkan pilihan Komik, Light Novel, Novel Biasa, Buku Bacaan Biasa, atau Lagu / Soundtrack
 function sesuaikanFormKategori(tipe) {
     inputKategori.value = tipe;
+    perbaruiLabelStatusUI(tipe);
+
     if (tipe === 'Light Novel') {
         judulFormTambah.textContent = 'Tambah Light Novel Baru';
         labelJudul.textContent = 'Judul Light Novel';
@@ -127,6 +183,7 @@ function sesuaikanFormKategori(tipe) {
         wadahHalamanBuku.style.display = 'none';
         inputHalamanAwal.required = false;
         inputHalamanAkhir.required = false;
+        wadahLaguSosmed.style.display = 'none';
         labelSampul.textContent = 'Poster / Sampul Light Novel';
     } else if (tipe === 'Novel Biasa') {
         judulFormTambah.textContent = 'Tambah Novel Biasa Baru';
@@ -139,6 +196,7 @@ function sesuaikanFormKategori(tipe) {
         wadahHalamanBuku.style.display = 'none';
         inputHalamanAwal.required = false;
         inputHalamanAkhir.required = false;
+        wadahLaguSosmed.style.display = 'none';
         labelSampul.textContent = 'Poster / Sampul Novel Biasa';
     } else if (tipe === 'Buku Bacaan Biasa') {
         judulFormTambah.textContent = 'Tambah Buku Bacaan Biasa';
@@ -151,7 +209,21 @@ function sesuaikanFormKategori(tipe) {
         wadahHalamanBuku.style.display = 'grid';
         inputHalamanAwal.required = true;
         inputHalamanAkhir.required = true;
+        wadahLaguSosmed.style.display = 'none';
         labelSampul.textContent = 'Poster / Sampul Buku Bacaan';
+    } else if (tipe === 'Lagu / Soundtrack') {
+        judulFormTambah.textContent = 'Tambah Lagu / Soundtrack Status Sosmed';
+        labelJudul.textContent = 'Judul Lagu / Soundtrack';
+        inputJudul.placeholder = 'Contoh: Deep Down / Sparkle (Ost. Your Name)';
+        wadahVolume.style.display = 'none';
+        inputVolume.value = '';
+        wadahChapter.style.display = 'none';
+        inputChapter.required = false;
+        wadahHalamanBuku.style.display = 'none';
+        inputHalamanAwal.required = false;
+        inputHalamanAkhir.required = false;
+        wadahLaguSosmed.style.display = 'grid';
+        labelSampul.textContent = 'Cover Album / Thumbnail Audio (Opsional)';
     } else {
         judulFormTambah.textContent = 'Tambah Komik Baru';
         labelJudul.textContent = 'Judul Komik';
@@ -163,6 +235,7 @@ function sesuaikanFormKategori(tipe) {
         wadahHalamanBuku.style.display = 'none';
         inputHalamanAwal.required = false;
         inputHalamanAkhir.required = false;
+        wadahLaguSosmed.style.display = 'none';
         labelSampul.textContent = 'Poster / Sampul Komik';
     }
 }
@@ -171,7 +244,7 @@ inputKategori.addEventListener('change', () => {
     sesuaikanFormKategori(inputKategori.value);
 });
 
-// Pengaturan Tab Modal
+// Pengaturan Tab Modal Login
 linkGantiMode.addEventListener('click', (e) => {
     e.preventDefault();
     modeDaftar = !modeDaftar;
@@ -256,12 +329,13 @@ onAuthStateChanged(auth, (user) => {
         btnBukaTambah.style.display = 'none';
         infoAkunNav.style.display = 'none';
         panelTambah.style.display = 'none';
+        showcaseAudioWadah.style.display = 'none';
         wadahDaftar.innerHTML = '';
         totalKomikBadge.textContent = `0 ${kategoriAktif}`;
     }
 });
 
-// 5. AMBIL DATA KOMIK & NOVEL DARI CLOUD FIRESTORE
+// 5. AMBIL DATA KOLEKSI DARI CLOUD FIRESTORE
 async function muatKomikDariCloud() {
     wadahDaftar.innerHTML = `<p style="color:#a1a1aa; grid-column: 1/-1; text-align:center; padding: 40px 0;">Memuat koleksi dari Cloud...</p>`;
     const q = query(collection(db, "koleksi_komik"), where("uid", "==", userSaatIni.uid));
@@ -275,25 +349,118 @@ async function muatKomikDariCloud() {
     tampilkanKomik();
 }
 
-// 6. TAMPILKAN GRID KOMIK / LIGHT NOVEL / NOVEL BIASA SESUAI TAB AKTIF
+// Render Showcase Kartu 2x2 "🎵 Audio" ala Koleksi Sosmed (Khusus Tab Lagu / Soundtrack)
+function renderShowcaseAudio(semuaLaguUser) {
+    if (kategoriAktif !== 'Lagu / Soundtrack') {
+        showcaseAudioWadah.style.display = 'none';
+        return;
+    }
+
+    showcaseAudioWadah.style.display = 'block';
+
+    // Ambil maksimal 4 gambar sampul dari koleksi lagu untuk membuat 2x2 collage seperti gambar contoh
+    const laguDenganSampul = semuaLaguUser.filter((item) => Boolean(item.sampul));
+    const ikonFallback = ['🎵', '🎧', '🎶', '✨'];
+    let cellsHTML = '';
+
+    for (let i = 0; i < 4; i++) {
+        if (laguDenganSampul[i]) {
+            cellsHTML += `
+                <div class="audio-collage-cell">
+                    <img src="${laguDenganSampul[i].sampul}" alt="${bersihkanTeks(laguDenganSampul[i].judul)}">
+                </div>
+            `;
+        } else {
+            cellsHTML += `<div class="audio-collage-cell">${ikonFallback[i]}</div>`;
+        }
+    }
+
+    const jmlSiapPakai = semuaLaguUser.filter((l) => l.status === 'Rencana Baca').length;
+    const jmlFavorit = semuaLaguUser.filter((l) => l.status === 'Sedang Dibaca').length;
+    const jmlSudahDipakai = semuaLaguUser.filter((l) => l.status === 'Tamat').length;
+
+    const daftarPilihanPills = [
+        { nilai: 'All', label: 'All' },
+        { nilai: 'Instagram Story / Reels', label: '📸 Reels & Story' },
+        { nilai: 'TikTok Sound', label: '🎵 TikTok' },
+        { nilai: 'WhatsApp Status', label: '💬 WA Status' },
+        { nilai: 'YouTube Shorts', label: '🎬 Shorts' },
+        { nilai: 'Vibe Aesthetic / Chill', label: '✨ Aesthetic / Chill' },
+        { nilai: 'Vibe Hype / Anime / Gaming', label: '🔥 Hype / Anime' }
+    ];
+
+    const pillsHTML = daftarPilihanPills.map((p) => {
+        const kelasAktif = filterPlatformSosmed === p.nilai ? 'active' : '';
+        return `<button type="button" class="sosmed-pill ${kelasAktif}" onclick="pilihFilterPlatform('${p.nilai}')">${p.label}</button>`;
+    }).join('');
+
+    showcaseAudioWadah.innerHTML = `
+        <div class="sosmed-pills-bar">
+            ${pillsHTML}
+        </div>
+        <div class="audio-collection-row">
+            <div class="audio-folder-card">
+                <div class="audio-collage-grid">
+                    ${cellsHTML}
+                </div>
+                <div class="audio-folder-label">
+                    <span>🎵</span>
+                    <span>Audio</span>
+                </div>
+            </div>
+            <div class="audio-collection-info">
+                <h3>Koleksi Lagu & Soundtrack Status Sosmed</h3>
+                <p>Simpan backsound, lagu favorit, potongan detik reff, dan link audio untuk kebutuhan Instagram Story, Reels, TikTok, maupun WhatsApp Status.</p>
+                <div class="audio-stats-badges">
+                    <span class="audio-stat-chip">🎵 Total: ${semuaLaguUser.length} Audio</span>
+                    <span class="audio-stat-chip">🎧 Favorit: ${jmlFavorit}</span>
+                    <span class="audio-stat-chip">📌 Siap Pakai: ${jmlSiapPakai}</span>
+                    <span class="audio-stat-chip">✅ Sudah Dipakai: ${jmlSudahDipakai}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+window.pilihFilterPlatform = (nilaiPlatform) => {
+    filterPlatformSosmed = nilaiPlatform;
+    tampilkanKomik();
+};
+
+// 6. TAMPILKAN GRID KOLEKSI SESUAI TAB AKTIF
 function tampilkanKomik() {
     wadahDaftar.innerHTML = '';
     const kataKunci = inputCari.value.toLowerCase();
 
-    // Update teks UI berdasarkan tab yang aktif (Komik / Light Novel / Novel Biasa)
-    btnBukaTambah.textContent = `+ Tambah ${kategoriAktif}`;
-    inputCari.placeholder = `Cari judul ${kategoriAktif.toLowerCase()} di koleksimu...`;
+    perbaruiLabelFilterTab(kategoriAktif);
+
+    // Update teks UI berdasarkan tab yang aktif
+    const labelTombolTambah = kategoriAktif === 'Lagu / Soundtrack' ? 'Lagu / Audio' : kategoriAktif;
+    btnBukaTambah.textContent = `+ Tambah ${labelTombolTambah}`;
+    inputCari.placeholder = kategoriAktif === 'Lagu / Soundtrack'
+        ? 'Cari judul lagu, penyanyi, atau catatan vibe status...'
+        : `Cari judul ${kategoriAktif.toLowerCase()} di koleksimu...`;
     judulDaftar.textContent = `Daftar Koleksi ${kategoriAktif}`;
+
+    const semuaLaguUser = koleksiKomik.filter((item) => normalisasiKategori(item.kategori) === 'Lagu / Soundtrack');
+    renderShowcaseAudio(semuaLaguUser);
 
     const komikTersaring = koleksiKomik.filter((komik) => {
         const tipeBacaan = normalisasiKategori(komik.kategori);
-        const cocokJudul = komik.judul.toLowerCase().includes(kataKunci);
+        const teksPencarianGabungan = `${komik.judul || ''} ${komik.artisLagu || ''} ${komik.catatanLagu || ''} ${komik.platformLagu || ''}`.toLowerCase();
+        const cocokJudul = teksPencarianGabungan.includes(kataKunci);
         const cocokStatus = filterAktif === 'Semua' || komik.status === filterAktif;
         const cocokKategori = tipeBacaan === kategoriAktif;
-        return cocokJudul && cocokStatus && cocokKategori;
+
+        let cocokPlatform = true;
+        if (kategoriAktif === 'Lagu / Soundtrack' && filterPlatformSosmed !== 'All') {
+            cocokPlatform = (komik.platformLagu || 'Semua Sosmed') === filterPlatformSosmed;
+        }
+
+        return cocokJudul && cocokStatus && cocokKategori && cocokPlatform;
     });
 
-    totalKomikBadge.textContent = `${komikTersaring.length} ${kategoriAktif}`;
+    totalKomikBadge.textContent = `${komikTersaring.length} ${labelTombolTambah}`;
 
     if (komikTersaring.length === 0) {
         wadahDaftar.innerHTML = `<p style="color:#a1a1aa; grid-column: 1/-1; text-align:center; padding: 40px 0;">Belum ada ${kategoriAktif.toLowerCase()} yang ditemukan.</p>`;
@@ -302,15 +469,18 @@ function tampilkanKomik() {
 
     komikTersaring.forEach((komik) => {
         const kartu = document.createElement('div');
-        kartu.className = 'comic-card';
-
         const tipeBacaan = normalisasiKategori(komik.kategori);
         const isLightNovel = tipeBacaan === 'Light Novel';
         const isNovelBiasa = tipeBacaan === 'Novel Biasa';
         const isBukuBiasa = tipeBacaan === 'Buku Bacaan Biasa';
+        const isLagu = tipeBacaan === 'Lagu / Soundtrack';
+
+        kartu.className = isLagu ? 'comic-card audio-card' : 'comic-card';
 
         let kelasTipe = 'type-komik';
         let ikonTipe = '📘';
+        let labelBadgeTipe = tipeBacaan;
+
         if (isLightNovel) {
             kelasTipe = 'type-novel';
             ikonTipe = '✨';
@@ -320,28 +490,58 @@ function tampilkanKomik() {
         } else if (isBukuBiasa) {
             kelasTipe = 'type-buku';
             ikonTipe = '📕';
+        } else if (isLagu) {
+            kelasTipe = 'type-lagu';
+            ikonTipe = '🎵';
+            labelBadgeTipe = komik.platformLagu || 'Soundtrack';
         }
 
         let kelasStatus = 'status-reading';
-        let labelStatus = 'Reading';
+        let labelStatusKartu = isLagu ? 'Favorit' : 'Reading';
         if (komik.status === 'Tamat') {
             kelasStatus = 'status-tamat';
-            labelStatus = 'Completed';
+            labelStatusKartu = isLagu ? 'Sudah Dipakai' : 'Completed';
         } else if (komik.status === 'Rencana Baca') {
             kelasStatus = 'status-rencana';
-            labelStatus = 'Plan';
+            labelStatusKartu = isLagu ? 'Siap Pakai' : 'Plan';
         }
 
         const posterHTML = komik.sampul
             ? `<img src="${komik.sampul}" alt="${bersihkanTeks(komik.judul)}">`
             : `<div class="poster-placeholder">${ikonTipe}</div>`;
 
-        // Format teks progress bacaan
+        // Format teks progress bacaan atau detail lagu status sosmed
         let teksChapter = '';
         let aksiTambahHTML = '';
         let labelEditCabang = '📝 Edit Nama & Chapter';
+        let infoTambahanLaguHTML = '';
 
-        if (isBukuBiasa) {
+        if (isLagu) {
+            const jmlDipakai = Number(komik.chapter) || 0;
+            const bagianDetik = komik.timestampLagu ? `⏱️ ${bersihkanTeks(komik.timestampLagu)}` : `🎵 Dipakai ${jmlDipakai}x`;
+            teksChapter = bagianDetik;
+            labelEditCabang = '📝 Edit Info Lagu';
+
+            const teksArtis = komik.artisLagu ? `🎤 ${bersihkanTeks(komik.artisLagu)}` : '🎤 Audio / Soundtrack Sosmed';
+            const teksCatatan = komik.catatanLagu
+                ? `<div class="song-note">💡 ${bersihkanTeks(komik.catatanLagu)}</div>`
+                : '';
+
+            infoTambahanLaguHTML = `
+                <div class="song-artist" title="${teksArtis}">${teksArtis}</div>
+                ${teksCatatan}
+            `;
+
+            const tombolLinkHTML = komik.linkLagu
+                ? `<a href="${bersihkanTeks(komik.linkLagu)}" target="_blank" rel="noopener noreferrer" class="btn-aksi-lagu" title="Buka Link Audio / Lagu">▶️</a>`
+                : '';
+
+            aksiTambahHTML = `
+                ${tombolLinkHTML}
+                <button type="button" class="btn-aksi-lagu" onclick="salinInfoLagu('${komik.id}', this)" title="Salin Judul & Detik Lagu untuk Status Sosmed">📋</button>
+                <button type="button" class="btn-plus-ch" onclick="tambahChapter('${komik.id}', ${jmlDipakai})" title="Tambah +1 Kali Dipakai di Status">+1</button>
+            `;
+        } else if (isBukuBiasa) {
             const halAwal = komik.halamanAwal || 1;
             const halAkhir = komik.halamanAkhir || komik.chapter || 1;
             teksChapter = `Hal. ${halAwal} - ${halAkhir}`;
@@ -358,8 +558,8 @@ function tampilkanKomik() {
         kartu.innerHTML = `
             <div class="poster-wrapper">
                 ${posterHTML}
-                <span class="status-pill ${kelasStatus}">${labelStatus}</span>
-                <span class="type-pill ${kelasTipe}">${ikonTipe} ${tipeBacaan}</span>
+                <span class="status-pill ${kelasStatus}">${labelStatusKartu}</span>
+                <span class="type-pill ${kelasTipe}">${ikonTipe} ${bersihkanTeks(labelBadgeTipe)}</span>
                 <button class="btn-hapus-card" onclick="hapusKomik('${komik.id}')" title="Hapus ${tipeBacaan}">🗑️</button>
                 <button class="btn-menu-edit" onclick="toggleMenuEdit(event, '${komik.id}')" title="Menu Edit ${tipeBacaan}">✏️</button>
                 <div id="menu-edit-${komik.id}" class="cabang-edit-menu">
@@ -369,8 +569,9 @@ function tampilkanKomik() {
             </div>
             <div class="card-body">
                 <h3 class="comic-title" title="${bersihkanTeks(komik.judul)}">${bersihkanTeks(komik.judul)}</h3>
+                ${infoTambahanLaguHTML}
                 <div class="chapter-row">
-                    <span class="chapter-badge">${teksChapter}</span>
+                    <span class="chapter-badge" title="${teksChapter}">${teksChapter}</span>
                     ${aksiTambahHTML}
                 </div>
             </div>
@@ -378,6 +579,27 @@ function tampilkanKomik() {
         wadahDaftar.appendChild(kartu);
     });
 }
+
+// Salin Info Lagu ke Clipboard untuk Memudahkan Cari Sound saat Bikin Status Sosmed
+window.salinInfoLagu = async (idDokumen, elemenTombol) => {
+    const item = koleksiKomik.find((k) => k.id === idDokumen);
+    if (!item) return;
+
+    const bagianArtis = item.artisLagu ? ` - ${item.artisLagu}` : '';
+    const bagianDetik = item.timestampLagu ? ` (${item.timestampLagu})` : '';
+    const teksSalin = `${item.judul}${bagianArtis}${bagianDetik}`;
+
+    try {
+        await navigator.clipboard.writeText(teksSalin);
+        const teksAsli = elemenTombol.textContent;
+        elemenTombol.textContent = '✅';
+        setTimeout(() => {
+            elemenTombol.textContent = teksAsli;
+        }, 1200);
+    } catch (err) {
+        alert(`Disalin: ${teksSalin}`);
+    }
+};
 
 // 7. KOMPRES FOTO SAMPUL & SIMPAN KE CLOUD
 function kecilkanFoto(fileGambar) {
@@ -442,21 +664,23 @@ btnTutupTambah.addEventListener('click', () => panelTambah.style.display = 'none
 
 function sinkronkanTabDenganKategori(tipe) {
     kategoriAktif = tipe;
+    tabKomik.classList.remove('active');
+    tabNovel.classList.remove('active');
+    tabBuku.classList.remove('active');
+    tabLagu.classList.remove('active');
+
     if (tipe === 'Komik') {
         tabKomik.classList.add('active');
-        tabNovel.classList.remove('active');
-        tabBuku.classList.remove('active');
         cabangNovelBar.style.display = 'none';
     } else if (tipe === 'Buku Bacaan Biasa') {
-        tabKomik.classList.remove('active');
-        tabNovel.classList.remove('active');
         tabBuku.classList.add('active');
+        cabangNovelBar.style.display = 'none';
+    } else if (tipe === 'Lagu / Soundtrack') {
+        tabLagu.classList.add('active');
         cabangNovelBar.style.display = 'none';
     } else {
         subNovelAktif = tipe;
-        tabKomik.classList.remove('active');
         tabNovel.classList.add('active');
-        tabBuku.classList.remove('active');
         cabangNovelBar.style.display = 'grid';
         subNovelBtns.forEach((b) => {
             b.classList.toggle('active', b.getAttribute('data-subnovel') === subNovelAktif);
@@ -476,9 +700,12 @@ formKomik.addEventListener('submit', async (e) => {
         : null;
 
     const isBukuBiasa = tipeDipilih === 'Buku Bacaan Biasa';
+    const isLagu = tipeDipilih === 'Lagu / Soundtrack';
     const halAwal = isBukuBiasa ? (Number(inputHalamanAwal.value) || 1) : null;
     const halAkhir = isBukuBiasa ? (Number(inputHalamanAkhir.value) || 1) : null;
-    const nilaiChapter = isBukuBiasa ? halAkhir : (Number(inputChapter.value) || 0);
+    const nilaiChapter = isBukuBiasa
+        ? halAkhir
+        : (isLagu ? 0 : (Number(inputChapter.value) || 0));
 
     let dataFoto = null;
     if (inputSampul.files && inputSampul.files[0]) {
@@ -493,6 +720,11 @@ formKomik.addEventListener('submit', async (e) => {
         chapter: nilaiChapter,
         halamanAwal: halAwal,
         halamanAkhir: halAkhir,
+        artisLagu: isLagu ? inputArtisLagu.value.trim() : null,
+        timestampLagu: isLagu ? inputTimestampLagu.value.trim() : null,
+        platformLagu: isLagu ? inputPlatformLagu.value : null,
+        linkLagu: isLagu ? inputLinkLagu.value.trim() : null,
+        catatanLagu: isLagu ? inputCatatanLagu.value.trim() : null,
         status: inputStatus.value,
         sampul: dataFoto
     });
@@ -503,12 +735,12 @@ formKomik.addEventListener('submit', async (e) => {
     btnSimpanKomik.disabled = false;
     panelTambah.style.display = 'none';
 
-    // Pindahkan ke tab sesuai bacaan yang baru disimpan
+    // Pindahkan ke tab sesuai item yang baru disimpan
     sinkronkanTabDenganKategori(tipeDipilih);
     muatKomikDariCloud();
 });
 
-// 8. MENU EDIT BERCABANG (1. EDIT FOTO, 2. EDIT NAMA & CHAPTER / HALAMAN) & HAPUS DI CLOUD
+// 8. MENU EDIT BERCABANG (1. EDIT FOTO, 2. EDIT NAMA & CHAPTER / HALAMAN / INFO LAGU) & HAPUS DI CLOUD
 function tutupSemuaMenuEdit() {
     document.querySelectorAll('.cabang-edit-menu.terbuka').forEach((menu) => {
         menu.classList.remove('terbuka');
@@ -536,7 +768,7 @@ document.addEventListener('click', () => {
     tutupSemuaMenuEdit();
 });
 
-// Cabang 1: Edit Foto Poster
+// Cabang 1: Edit Foto Poster / Cover Album
 window.pilihGambarBaru = (idDokumen, elemenTombol) => {
     tutupSemuaMenuEdit();
     idKomikGantiPoster = idDokumen;
@@ -571,7 +803,7 @@ inputGantiSampul.addEventListener('change', async () => {
     }
 });
 
-// Cabang 2: Edit Nama Komik/Novel & Tambahan Chapter / Rentang Halaman
+// Cabang 2: Edit Nama & Tambahan Chapter / Rentang Halaman / Info Lagu
 function updatePreviewHalamanEdit() {
     const awal = Math.max(1, Number(editHalamanAwal.value) || 1);
     const akhirDasar = Math.max(1, Number(editHalamanAkhir.value) || 1);
@@ -589,18 +821,30 @@ window.bukaModalEdit = (idDokumen) => {
     const tipe = normalisasiKategori(data.kategori);
     judulModalEdit.textContent = `Edit ${tipe}`;
     labelEditJudul.textContent = `Nama / Judul ${tipe}`;
-    inputEditJudul.value = data.judul;
+    inputEditJudul.value = data.judul || '';
 
     if (tipe === 'Buku Bacaan Biasa') {
         grupEditChapter.style.display = 'none';
         grupEditHalaman.style.display = 'block';
+        grupEditLagu.style.display = 'none';
         editHalamanAwal.value = data.halamanAwal || 1;
         editHalamanAkhir.value = data.halamanAkhir || data.chapter || 1;
         inputTambahHalaman.value = 0;
         updatePreviewHalamanEdit();
+    } else if (tipe === 'Lagu / Soundtrack') {
+        grupEditChapter.style.display = 'none';
+        grupEditHalaman.style.display = 'none';
+        grupEditLagu.style.display = 'block';
+        editArtisLagu.value = data.artisLagu || '';
+        editTimestampLagu.value = data.timestampLagu || '';
+        editPlatformLagu.value = data.platformLagu || 'Semua Sosmed';
+        editLinkLagu.value = data.linkLagu || '';
+        editCatatanLagu.value = data.catatanLagu || '';
+        editStatusLagu.value = data.status || 'Rencana Baca';
     } else {
         grupEditChapter.style.display = 'block';
         grupEditHalaman.style.display = 'none';
+        grupEditLagu.style.display = 'none';
         inputTambahChapter.value = 0;
         teksChLama.textContent = `Ch. ${data.chapter}`;
         teksChBaru.textContent = `Ch. ${data.chapter}`;
@@ -656,6 +900,17 @@ formEditInfo.addEventListener('submit', async (e) => {
                 halamanAkhir: akhirBaru,
                 chapter: akhirBaru
             });
+        } else if (tipe === 'Lagu / Soundtrack') {
+            await updateDoc(doc(db, "koleksi_komik", komikSedangDiedit.id), {
+                kategori: 'Lagu / Soundtrack',
+                judul: judulBaru,
+                artisLagu: editArtisLagu.value.trim(),
+                timestampLagu: editTimestampLagu.value.trim(),
+                platformLagu: editPlatformLagu.value,
+                linkLagu: editLinkLagu.value.trim(),
+                catatanLagu: editCatatanLagu.value.trim(),
+                status: editStatusLagu.value
+            });
         } else {
             const tambahanCh = Math.max(0, Number(inputTambahChapter.value) || 0);
             const chapterBaru = Number(komikSedangDiedit.chapter) + tambahanCh;
@@ -706,7 +961,7 @@ filterBtns.forEach((btn) => {
     });
 });
 
-// Navigasi 3 Tab Utama: Komik, Novel (Bercabang: Light Novel & Novel Biasa), dan Buku Bacaan Biasa
+// Navigasi 4 Tab Utama: Komik, Novel (Bercabang: Light Novel & Novel Biasa), Buku Bacaan Biasa, dan Lagu / Soundtrack
 tabKomik.addEventListener('click', () => {
     sinkronkanTabDenganKategori('Komik');
     tampilkanKomik();
@@ -719,6 +974,11 @@ tabNovel.addEventListener('click', () => {
 
 tabBuku.addEventListener('click', () => {
     sinkronkanTabDenganKategori('Buku Bacaan Biasa');
+    tampilkanKomik();
+});
+
+tabLagu.addEventListener('click', () => {
+    sinkronkanTabDenganKategori('Lagu / Soundtrack');
     tampilkanKomik();
 });
 

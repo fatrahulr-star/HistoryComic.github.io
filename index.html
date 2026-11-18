@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fr.asw Style - Komik & Novel History</title>
+    <title>HistorySaver - Komik, Novel, Buku & Soundtrack History</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
     <nav class="navbar">
         <div class="nav-brand">
             <span class="logo-icon">⚡</span>
-            <h1>History<span>All</span></h1>
+            <h1>History<span>Saver</span></h1>
         </div>
         <div class="nav-actions">
             <button id="btn-buka-tambah" class="btn-tambah-nav" style="display: none;">+ Tambah Komik</button>
@@ -26,11 +26,12 @@
 
     <!-- KONTEN UTAMA -->
     <main class="container">
-        <!-- 3 Tab Utama: Komik, Novel (Bercabang: Light Novel & Novel Biasa), dan Buku Bacaan Biasa -->
+        <!-- 4 Tab Utama: Komik, Novel (Bercabang: Light Novel & Novel Biasa), Buku Bacaan Biasa, dan Lagu / Soundtrack -->
         <div class="category-tabs">
             <button type="button" class="cat-btn active" id="tab-komik" data-kategori="Komik">📘 Komik</button>
             <button type="button" class="cat-btn" id="tab-novel" data-kategori="Novel">📖 Novel ▾</button>
-            <button type="button" class="cat-btn" id="tab-buku" data-kategori="Buku Bacaan Biasa">📕 Buku Bacaan Biasa</button>
+            <button type="button" class="cat-btn" id="tab-buku" data-kategori="Buku Bacaan Biasa">📕 Buku Bacaan</button>
+            <button type="button" class="cat-btn" id="tab-lagu" data-kategori="Lagu / Soundtrack">🎵 Lagu & Audio</button>
         </div>
 
         <!-- Cabang Pilihan Novel: Light Novel & Novel Biasa -->
@@ -44,14 +45,14 @@
                 <input type="text" id="input-cari" placeholder="Cari judul komik di koleksimu...">
             </div>
             <div class="filter-tabs">
-                <button class="filter-btn active" data-filter="Semua">Semua</button>
-                <button class="filter-btn" data-filter="Sedang Dibaca">Reading</button>
-                <button class="filter-btn" data-filter="Tamat">Completed</button>
-                <button class="filter-btn" data-filter="Rencana Baca">Plan to Read</button>
+                <button class="filter-btn active" id="filter-semua" data-filter="Semua">Semua</button>
+                <button class="filter-btn" id="filter-reading" data-filter="Sedang Dibaca">Reading</button>
+                <button class="filter-btn" id="filter-completed" data-filter="Tamat">Completed</button>
+                <button class="filter-btn" id="filter-plan" data-filter="Rencana Baca">Plan to Read</button>
             </div>
         </section>
 
-        <!-- Form Tambah Komik / Light Novel / Novel Biasa / Buku Bacaan Biasa -->
+        <!-- Form Tambah Komik / Light Novel / Novel Biasa / Buku Bacaan Biasa / Lagu & Soundtrack -->
         <section id="panel-tambah" class="panel-tambah" style="display: none;">
             <div class="panel-header">
                 <h2 id="judul-form-tambah">Tambah Komik Baru</h2>
@@ -59,12 +60,13 @@
             </div>
             <form id="form-komik" class="form-grid">
                 <div>
-                    <label>Jenis Bacaan</label>
+                    <label>Jenis Koleksi</label>
                     <select id="kategori">
                         <option value="Komik">📘 Komik (Manga / Manhwa / Manhua)</option>
                         <option value="Light Novel">✨ Light Novel (Web Novel / LN)</option>
                         <option value="Novel Biasa">📖 Novel Biasa</option>
                         <option value="Buku Bacaan Biasa">📕 Buku Bacaan Biasa</option>
+                        <option value="Lagu / Soundtrack">🎵 Lagu / Soundtrack (Status Sosmed)</option>
                     </select>
                 </div>
                 <div>
@@ -89,12 +91,45 @@
                         <input type="number" id="halaman-akhir" placeholder="Contoh: 45" min="1">
                     </div>
                 </div>
+
+                <!-- Input Khusus Lagu / Soundtrack untuk Kebutuhan Status Sosmed -->
+                <div id="wadah-lagu-sosmed" class="lagu-form-grid form-full" style="display: none;">
+                    <div>
+                        <label>Penyanyi / Artis / Sumber Sound</label>
+                        <input type="text" id="artis-lagu" placeholder="Contoh: Alok / Radwimps / Sound IG & TikTok">
+                    </div>
+                    <div>
+                        <label>Bagian / Timestamp Status (Opsional)</label>
+                        <input type="text" id="timestamp-lagu" placeholder="Contoh: 0:45 - 1:15 (Bagian Reff / Drop)">
+                    </div>
+                    <div>
+                        <label>Platform / Vibe Status Sosmed</label>
+                        <select id="platform-lagu">
+                            <option value="Semua Sosmed">📱 Semua Sosmed (IG / WA / TikTok)</option>
+                            <option value="Instagram Story / Reels">📸 Instagram Story / Reels</option>
+                            <option value="TikTok Sound">🎵 TikTok Sound</option>
+                            <option value="WhatsApp Status">💬 WhatsApp Status</option>
+                            <option value="YouTube Shorts">🎬 YouTube Shorts</option>
+                            <option value="Vibe Aesthetic / Chill">✨ Vibe Aesthetic / Chill / Malam</option>
+                            <option value="Vibe Hype / Anime / Gaming">🔥 Vibe Hype / Anime / Gaming</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Link Audio / Lagu (Opsional)</label>
+                        <input type="url" id="link-lagu" placeholder="https://open.spotify.com/... atau YouTube/IG/TikTok">
+                    </div>
+                    <div class="form-full">
+                        <label>Catatan / Ide Story atau Lirik Singkat (Opsional)</label>
+                        <input type="text" id="catatan-lagu" placeholder="Contoh: Cocok buat story pemandangan sore / perjalanan jauh">
+                    </div>
+                </div>
+
                 <div>
-                    <label>Status Baca</label>
+                    <label id="label-status">Status Baca</label>
                     <select id="status">
-                        <option value="Sedang Dibaca">Sedang Dibaca (Reading)</option>
-                        <option value="Tamat">Sudah Tamat (Completed)</option>
-                        <option value="Rencana Baca">Rencana Baca (Plan)</option>
+                        <option value="Sedang Dibaca" id="opt-status-reading">Sedang Dibaca (Reading)</option>
+                        <option value="Tamat" id="opt-status-completed">Sudah Tamat (Completed)</option>
+                        <option value="Rencana Baca" id="opt-status-plan">Rencana Baca (Plan)</option>
                     </select>
                 </div>
                 <div class="form-full">
@@ -114,17 +149,20 @@
             </form>
         </section>
 
+        <!-- Showcase Koleksi Audio 2x2 ala Saved Collection (Khusus Tab Lagu / Soundtrack) -->
+        <section id="showcase-audio-wadah" class="showcase-audio-wadah" style="display: none;"></section>
+
         <div class="section-title">
             <h2 id="judul-daftar">Daftar Koleksi Komik</h2>
             <span id="total-komik" class="badge-total">0 Komik</span>
         </div>
 
         <div id="daftar-komik" class="shinigami-grid"></div>
-        <!-- Input File Tersembunyi untuk Mengubah Poster Komik/Novel yang Sudah Disimpan -->
+        <!-- Input File Tersembunyi untuk Mengubah Poster Komik/Novel/Lagu yang Sudah Disimpan -->
         <input type="file" id="input-ganti-sampul" accept="image/*" style="display: none;">
     </main>
 
-    <!-- MODAL EDIT NAMA & TAMBAHAN CHAPTER / HALAMAN -->
+    <!-- MODAL EDIT NAMA & TAMBAHAN CHAPTER / HALAMAN / INFO LAGU -->
     <div id="modal-edit" class="modal-overlay" style="display: none;">
         <div class="auth-card edit-card">
             <div class="panel-header" style="margin-bottom: 16px;">
@@ -136,7 +174,7 @@
                     <label id="label-edit-judul">Nama / Judul Komik</label>
                     <input type="text" id="input-edit-judul" placeholder="Masukkan judul..." required>
                 </div>
-                <!-- Untuk Komik & Light Novel (Chapter) -->
+                <!-- Untuk Komik, Light Novel & Novel Biasa (Chapter) -->
                 <div id="grup-edit-chapter" class="edit-field-group">
                     <label>Tambahan Chapter yang Sudah Dibaca</label>
                     <input type="number" id="input-tambah-chapter" placeholder="Contoh: 5 (Ketik 0 jika tidak menambah)" value="0" min="0">
@@ -146,7 +184,7 @@
                         <span>Menjadi: <strong id="teks-ch-baru" class="highlight-ch">0</strong></span>
                     </div>
                 </div>
-                <!-- Untuk Novel Biasa / Buku Bacaan Biasa (Dari Halaman ... Sampai Halaman ...) -->
+                <!-- Untuk Buku Bacaan Biasa (Dari Halaman ... Sampai Halaman ...) -->
                 <div id="grup-edit-halaman" class="edit-field-group" style="display: none;">
                     <div class="rentang-halaman-edit">
                         <div>
@@ -163,6 +201,47 @@
                     <div class="info-kalkulasi-ch">
                         <span>Rentang Halaman:</span>
                         <strong id="teks-hal-preview" class="highlight-ch">Hal. 1 - 1</strong>
+                    </div>
+                </div>
+                <!-- Untuk Lagu / Soundtrack Status Sosmed -->
+                <div id="grup-edit-lagu" class="edit-field-group" style="display: none;">
+                    <div class="edit-field-group">
+                        <label>Penyanyi / Artis / Sumber Sound</label>
+                        <input type="text" id="edit-artis-lagu" placeholder="Contoh: Alok / Radwimps / Sound TikTok">
+                    </div>
+                    <div class="rentang-halaman-edit" style="margin-bottom: 12px;">
+                        <div>
+                            <label>Bagian / Detik Status</label>
+                            <input type="text" id="edit-timestamp-lagu" placeholder="Contoh: 0:45 - 1:15">
+                        </div>
+                        <div>
+                            <label>Platform / Vibe</label>
+                            <select id="edit-platform-lagu">
+                                <option value="Semua Sosmed">📱 Semua Sosmed</option>
+                                <option value="Instagram Story / Reels">📸 IG Story / Reels</option>
+                                <option value="TikTok Sound">🎵 TikTok Sound</option>
+                                <option value="WhatsApp Status">💬 WhatsApp Status</option>
+                                <option value="YouTube Shorts">🎬 YouTube Shorts</option>
+                                <option value="Vibe Aesthetic / Chill">✨ Vibe Aesthetic / Chill</option>
+                                <option value="Vibe Hype / Anime / Gaming">🔥 Vibe Hype / Anime</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="edit-field-group">
+                        <label>Link Audio / Lagu (Opsional)</label>
+                        <input type="url" id="edit-link-lagu" placeholder="https://open.spotify.com/... atau link video/sound">
+                    </div>
+                    <div class="edit-field-group">
+                        <label>Catatan / Ide Story (Opsional)</label>
+                        <input type="text" id="edit-catatan-lagu" placeholder="Contoh: Cocok buat story malam hari">
+                    </div>
+                    <div class="edit-field-group" style="margin-bottom: 4px;">
+                        <label>Status Pemakaian Audio</label>
+                        <select id="edit-status-lagu">
+                            <option value="Sedang Dibaca">🎧 Favorit / Sering Dipakai (On Repeat)</option>
+                            <option value="Rencana Baca">📌 Siap Dipakai Status (Saved)</option>
+                            <option value="Tamat">✅ Sudah Dipakai di Status (Used)</option>
+                        </select>
                     </div>
                 </div>
                 <button type="submit" id="btn-simpan-edit" class="btn-simpan-komik" style="margin-top: 8px;">Simpan Perubahan</button>
